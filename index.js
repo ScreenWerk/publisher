@@ -10,6 +10,7 @@ if (!process.env.ENTU_ACCOUNT) throw new Error('ENTU_ACCOUNT missing in environm
 if (!process.env.ENTU_KEY) throw new Error('ENTU_KEY missing in environment')
 if (!process.env.SPACES_ENDPOINT) throw new Error('SPACES_ENDPOINT missing in environment')
 if (!process.env.SPACES_BUCKET) throw new Error('SPACES_BUCKET missing in environment')
+if (!process.env.SPACES_BUCKET2) throw new Error('SPACES_BUCKET2 missing in environment')
 if (!process.env.SPACES_KEY) throw new Error('SPACES_KEY missing in environment')
 if (!process.env.SPACES_SECRET) throw new Error('SPACES_SECRET missing in environment')
 
@@ -28,10 +29,11 @@ async function main () {
 
       const file = JSON.stringify(screen)
 
-      await uploadJSON(`screen/${screen.screenEid}.json`, file)
+      await uploadJSON(process.env.SPACES_BUCKET, `screen/${screen.screenEid}.json`, file)
+      await uploadJSON(process.env.SPACES_BUCKET2, `screen/${screen.screenEid}.json`, file)
 
       if (screen._mid) {
-        await uploadJSON(`screen/${screen._mid}.json`, file)
+        await uploadJSON(process.env.SPACES_BUCKET, `screen/${screen._mid}.json`, file)
       }
     }
 
@@ -82,7 +84,8 @@ async function getAllData (publishedAt) {
   console.log(`Medias: ${medias.length}`)
   if (medias.length === 0) return []
 
-  await uploadMedia(medias)
+  await uploadMedia(process.env.SPACES_BUCKET, medias)
+  await uploadMedia(process.env.SPACES_BUCKET2, medias)
 
   return screenGroups.map((screenGroup) => {
     const screensForScreenGroup = screens.filter((x) => x.screenGroup === screenGroup._id)
@@ -538,7 +541,7 @@ async function apiFetch (path, query) {
   return response.json()
 }
 
-async function uploadJSON (key, file) {
+async function uploadJSON (bucket, key, file) {
   const spacesClient = new S3Client({
     region: process.env.SPACES_REGION,
     endpoint: process.env.SPACES_ENDPOINT,
@@ -549,7 +552,7 @@ async function uploadJSON (key, file) {
   })
 
   const command = new PutObjectCommand({
-    Bucket: process.env.SPACES_BUCKET,
+    Bucket: bucket,
     Key: key,
     Body: file,
     ContentType: 'application/json',
@@ -559,7 +562,7 @@ async function uploadJSON (key, file) {
   await spacesClient.send(command)
 }
 
-async function uploadMedia (medias) {
+async function uploadMedia (bucket, medias) {
   const spacesClient = new S3Client({
     region: process.env.SPACES_REGION,
     endpoint: process.env.SPACES_ENDPOINT,
@@ -576,7 +579,7 @@ async function uploadMedia (medias) {
 
     try {
       const headCommand = new HeadObjectCommand({
-        Bucket: process.env.SPACES_BUCKET,
+        Bucket: bucket,
         Key: key
       })
 
@@ -600,7 +603,7 @@ async function uploadMedia (medias) {
         const upload = new Upload({
           client: spacesClient,
           params: {
-            Bucket: process.env.SPACES_BUCKET,
+            Bucket: bucket,
             Key: key,
             Body: response.body,
             ContentDisposition: `attachment;filename="${sanitizedFileName}"`,
