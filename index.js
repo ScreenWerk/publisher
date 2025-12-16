@@ -205,7 +205,7 @@ async function getAllData (publishedAt) {
                     stretch: playlistMedia.stretch,
                     mediaEid: media._id,
                     file: `${process.env.ENTU_URL}/${process.env.ENTU_ACCOUNT}/property/${media.fileId}?download=true`,
-                    fileDO: `https://swpublisher.entu.eu/media/${media._id}/${media.fileId}`,
+                    fileDO: `https://files.screenwerk.ee/media/${media._id}/${media.fileId}`,
                     fileName: media.fileName,
                     height: media.height,
                     width: media.width,
