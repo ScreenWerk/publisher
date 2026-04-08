@@ -556,7 +556,8 @@ async function uploadJSON (bucket, key, file) {
     Key: key,
     Body: file,
     ContentType: 'application/json',
-    ACL: 'public-read'
+    ACL: 'public-read',
+    CacheControl: 'public, max-age=60'
   })
 
   await spacesClient.send(command)
