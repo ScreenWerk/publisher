@@ -193,7 +193,7 @@ async function getAllData (publishedAt) {
                   }
 
                   if (validTo && playlistMedia.validTo && new Date(validTo) > new Date(playlistMedia.validTo)) {
-                    validTo = playlistMedia.validFrom
+                    validTo = playlistMedia.validTo
                   }
 
                   return {
