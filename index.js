@@ -212,8 +212,8 @@ async function getAllData (publishedAt) {
                     name: media.name,
                     type: media.type,
                     url: media.url,
-                    validFrom: media.validFrom,
-                    validTo: media.validTo
+                    validFrom,
+                    validTo
                   }
                 }).filter((x) => x !== undefined).sort((a, b) => a.ordinal - b.ordinal)
               }
